@@ -20746,7 +20746,6 @@ G1 X121.072 Y115.454 E12.4214
 G92 E0
 G1 E-15.0000 F600
 G1 Z1.300 F1002
-; layer 3, Z = 0.225
 M106 S255
 G1 Y10 F4000; go to Y 10mm
 M104 S170 T0
@@ -21397,9 +21396,8 @@ G92 E0
 G1 E-15.0000 F600
 G1 Z1.450 F1002
 ; process Color1
-; layer 4, Z = 0.225
 ; tool H0.150 W0.480
-; layer 5, Z = 0.375
+; layer 5, Z = 0.3
 G1 Y10 F4000; go to Y 10mm
 M104 S170 T1
 M109 S200 T0
@@ -45975,8 +45973,8 @@ G92 E0
 G1 E-15.0000 F600
 G1 Z1.600 F1002
 ; process Color2
-; layer 6, Z = 0.375
-; layer 7, Z = 0.525
+; layer 6, Z = 0.3
+; layer 7, Z = 0.45
 G1 Y10 F4000; go to Y 10mm
 M104 S170 T0
 M109 S210 T1
@@ -47755,9 +47753,9 @@ G92 E0
 G1 E-15.0000 F600
 G1 Z1.750 F1002
 ; process Color1
-; layer 8, Z = 0.525
+; layer 8, Z = 0.45
 ; tool H0.150 W0.480
-; layer 9, Z = 0.675
+; layer 9, Z = 0.6
 G1 Y10 F4000; go to Y 10mm
 M104 S170 T1
 M109 S200 T0
@@ -72351,8 +72349,8 @@ G92 E0
 G1 E-15.0000 F600
 G1 Z1.900 F1002
 ; process Color2
-; layer 10, Z = 0.675
-; layer 11, Z = 0.825
+; layer 10, Z = 0.6
+; layer 11, Z = 0.75
 G1 Y10 F4000; go to Y 10mm
 M104 S170 T0
 M109 S210 T1
@@ -73950,9 +73948,9 @@ G92 E0
 G1 E-15.0000 F600
 G1 Z2.050 F1002
 ; process Color1
-; layer 12, Z = 0.825
+; layer 12, Z = 0.75
 ; tool H0.150 W0.480
-; layer 13, Z = 0.975
+; layer 13, Z = 0.9
 G1 Y10 F4000; go to Y 10mm
 M104 S170 T1
 M109 S200 T0
@@ -98560,8 +98558,8 @@ G92 E0
 G1 E-15.0000 F600
 G1 Z2.200 F1002
 ; process Color2
-; layer 14, Z = 0.975
-; layer 15, Z = 1.125
+; layer 14, Z = 0.9
+; layer 15, Z = 1.05
 G1 Y10 F4000; go to Y 10mm
 M104 S170 T0
 M109 S210 T1
@@ -99245,7 +99243,7 @@ G92 E0
 G1 E-1.0000 F1800
 G1 Z2.350 F1002
 ; tool H0.150 W0.480
-; layer 16, Z = 1.275
+; layer 16, Z = 1.2
 ; outer perimeter
 G1 X228.240 Y122.934 F4800
 G1 Z1.350 F1002
@@ -99854,7 +99852,7 @@ G1 X119.275 Y222.708 E13.9201
 G92 E0
 G1 E-1.0000 F1800
 G1 Z2.500 F1002
-; layer 17, Z = 1.425
+; layer 17, Z = 1.35
 ; outer perimeter
 G1 X126.837 Y227.066 F4800
 G1 Z1.500 F1002
@@ -101642,7 +101640,7 @@ G1 X231.505 Y115.454 E13.9201
 G92 E0
 G1 E-1.0000 F1800
 G1 Z2.650 F1002
-; layer 18, Z = 1.575
+; layer 18, Z = 1.5
 ; outer perimeter
 G1 X228.236 Y122.934 F4800
 G1 Z1.650 F1002
@@ -103235,7 +103233,7 @@ G1 X123.568 Y115.454 E13.9201
 G92 E0
 G1 E-1.0000 F1800
 ; layer end
-1.575
+1.571.5
 G28 X0 ; home X axis
 G28 Y0 ; home Y axis
 M104 S0 T0 ; turn off extruder

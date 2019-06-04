@@ -15,7 +15,7 @@ Authors:
 # ================================================================================================= #
 
 import  os
-
+import  time
 
 # ================================================================================================= #
 # Variables
@@ -24,8 +24,8 @@ import  os
 
 # USER MUST CHANGE THIS --------------------------------------------------------------------------- #
 input_filename                  = 'P6.gcode'
-target_layers                   = [3,5,7]
-squish_percentage               = 0.50
+target_layers                   = [3,5]
+squish_percentage               = [0.50,0.50]
 # ------------------------------------------------------------------------------------------------- #
 
 input_filename_wo_extension     = input_filename[ :input_filename.find('.') ]                       # extract input filename without extension
@@ -42,6 +42,9 @@ def read_gcode( filename ):
     Reads GCODE
     '''
 
+    t = current_time(start_time)
+    print( '[{:0.6f}] Reading GCODE'.format( t ) )
+    
     with open( filename, 'r' ) as f:
         lines = f.readlines()
 
@@ -54,8 +57,11 @@ def write_gcode( filename, lines ):
     Writes GCODE using input array of strings
     '''
 
+    t = current_time(start_time)
+    print( '[{:0.6f}] Writing GCODE'.format( t ) )
+    
     if os.path.exists( filename ):
-        print( '> Output filename exists... will remove to avoid overwriting issues' )
+        print( '[{:0.6f}] Existent output file will be removed'.format( t ) )
         os.remove( filename )
     
     f = open( output_filename, 'a+' )
@@ -70,24 +76,26 @@ def write_gcode( filename, lines ):
 
 # ------------------------------------------------------------------------------------------------- #
 
-def squish_layers( lines, layers, percentage ):
+def squish_layers( lines, layer, percentage ):
     '''
     Reduces selected layers by a specific percentage
     '''
 
-    Nlines                          = len(lines)                                                    # calculate number of lines in input file/data structure
+    print( '[{:0.6f}] Squishing!'.format( current_time(start_time) ) )
+    
 
+
+    Nlines                          = len(lines)                                                    # calculate number of lines in input file/data structure
     for i in range( 0, Nlines ):                                                                    # find layer height
         if lines[i][4:15] == 'layerHeight':
             layer_height            = float( lines[i][17:] )
-            print( '> GCODE Layer Height set to = {}'.format( layer_height ) )
+            print( '[{:0.6f}] GCODE Layer Height set to = {}'.format( current_time(start_time), layer_height ) )
             break
 
 
     # --------------------------------------------------------------------------------------------- # search for specific layer lines to modify
     mod_indeces                     = []
     mod_lines                       = []
-    layer                           = 3
     for i in range( 0, Nlines ):
 
         if lines[i][0:7] == '; layer':
@@ -109,22 +117,41 @@ def squish_layers( lines, layers, percentage ):
                 mod_lines.append(   mod_str     )
 
             
-                print( layer_number, z_height, mod_val )
+                print( '[{:0.6f}] \t {} \t {} \t {}'.format( current_time(start_time), layer_number, z_height, mod_val ) )
             
         else:
-            mod_lines.append(   lines[i] )
+            mod_lines.append(       lines[i] )
 
     # --------------------------------------------------------------------------------------------- # output/return
-    return mod_indeces, mod_lines        
+    return mod_indeces, mod_lines
+
+# ------------------------------------------------------------------------------------------------- #
+
+def current_time( start_time ):
+    '''
+    Stopwatch type function
+    '''
+    current_time                    = time.time() - start_time
+    return current_time
+
 
 # ================================================================================================= #
 # Program
 # ================================================================================================= #
 
+Nlayers                             = len( target_layers )
 
-input_file_obj, lines           = read_gcode( input_filename )
+start_time                          = time.time()
+input_file_obj, lines               = read_gcode( input_filename )
 
-mod_indeces, mod_lines = squish_layers( lines, 3, squish_percentage )
+if Nlayers == 1:
+    mod_indeces, mod_lines          = squish_layers( lines, target_layers[0], squish_percentage[0] )
+elif Nlayers > 1:
+    for i in range( 0, Nlayers ):
+        if i == 0:
+            mod_indeces, mod_lines  = squish_layers( lines, target_layers[i], squish_percentage[i] )
+        elif i > 0:
+            mod_indeces, mod_lines  = squish_layers( mod_lines, target_layers[i], squish_percentage[i] )
 
 write_gcode( output_filename, mod_lines )
 
