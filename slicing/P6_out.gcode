@@ -207,6 +207,7 @@ G92 E0
 G1 E-1.0000 F1800
 G1 Z1.150 F1002
 ; process Color1
+; layer 1, Z = 0.150
 G1 Y10 F4000; go to Y 10mm
 M104 S170 T1
 M109 S200 T0
@@ -20698,6 +20699,7 @@ G92 E0
 G1 E-1.0000 F1800
 G1 Z1.150 F1002
 ; process Color2
+; layer 2, Z = 0.150
 ; tool H0.150 W0.480
 ; ooze shield
 G1 X120.977 Y114.974 F4800
@@ -20746,6 +20748,7 @@ G1 X121.072 Y115.454 E12.4214
 G92 E0
 G1 E-15.0000 F600
 G1 Z1.300 F1002
+; layer 3, Z = 0.225
 M106 S255
 G1 Y10 F4000; go to Y 10mm
 M104 S170 T0
@@ -21396,6 +21399,7 @@ G92 E0
 G1 E-15.0000 F600
 G1 Z1.450 F1002
 ; process Color1
+; layer 4, Z = 0.225
 ; tool H0.150 W0.480
 ; layer 5, Z = 0.3
 G1 Y10 F4000; go to Y 10mm

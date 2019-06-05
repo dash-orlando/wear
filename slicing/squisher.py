@@ -94,6 +94,7 @@ def squish_layers( lines, layer, percentage ):
 
 
     # --------------------------------------------------------------------------------------------- # search for specific layer lines to modify
+    layers                          = []
     mod_indeces                     = []
     mod_lines                       = []
     for i in range( 0, Nlines ):
@@ -107,6 +108,8 @@ def squish_layers( lines, layer, percentage ):
             except:
                 pass
 
+            layers.append( (layer_number, z_height) )
+
             ddp = 0
             if layer_number >= layer:
                 if layer_number >= 10:
@@ -118,11 +121,17 @@ def squish_layers( lines, layer, percentage ):
 
             
                 print( '[{:0.6f}] \t {} \t {} \t {}'.format( current_time(start_time), layer_number, z_height, mod_val ) )
+
+            elif layer_number < layer:
+                mod_lines.append(   lines[i]    )
+
+                print( '[{:0.6f}] \t {} \t {} \t {}'.format( current_time(start_time), layer_number, z_height, z_height ) )
             
         else:
-            mod_lines.append(       lines[i] )
+            mod_lines.append(       lines[i]    )
 
     # --------------------------------------------------------------------------------------------- # output/return
+    print( layers )
     return mod_indeces, mod_lines
 
 # ------------------------------------------------------------------------------------------------- #
