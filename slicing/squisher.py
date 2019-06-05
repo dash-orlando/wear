@@ -16,6 +16,8 @@ Authors:
 
 import  os
 import  time
+import  numpy               as  np
+import  matplotlib.pyplot   as  plt
 
 # ================================================================================================= #
 # Variables
@@ -24,8 +26,8 @@ import  time
 
 # USER MUST CHANGE THIS --------------------------------------------------------------------------- #
 input_filename                  = 'P6.gcode'
-target_layers                   = [3,5]
-squish_percentage               = [0.50,0.50]
+target_layers                   = [3]#[3,5]
+squish_percentage               = [0.50]#[0.50,0.50]
 # ------------------------------------------------------------------------------------------------- #
 
 input_filename_wo_extension     = input_filename[ :input_filename.find('.') ]                       # extract input filename without extension
@@ -108,8 +110,6 @@ def squish_layers( lines, layer, percentage ):
             except:
                 pass
 
-            layers.append( (layer_number, z_height) )
-
             ddp = 0
             if layer_number >= layer:
                 if layer_number >= 10:
@@ -118,21 +118,20 @@ def squish_layers( lines, layer, percentage ):
                 mod_str             =  '{}{}\n'.format( lines[i][:(15+ddp)], str( mod_val ) )
                 mod_indeces.append( i           )
                 mod_lines.append(   mod_str     )
-
-            
+                layers.append(  (   layer_number, z_height, mod_val) )
+                
                 print( '[{:0.6f}] \t {} \t {} \t {}'.format( current_time(start_time), layer_number, z_height, mod_val ) )
 
             elif layer_number < layer:
                 mod_lines.append(   lines[i]    )
-
+                layers.append(  (   layer_number, z_height, z_height) )
                 print( '[{:0.6f}] \t {} \t {} \t {}'.format( current_time(start_time), layer_number, z_height, z_height ) )
             
         else:
             mod_lines.append(       lines[i]    )
-
+    
     # --------------------------------------------------------------------------------------------- # output/return
-    print( layers )
-    return mod_indeces, mod_lines
+    return mod_indeces, mod_lines, layers
 
 # ------------------------------------------------------------------------------------------------- #
 
@@ -143,26 +142,59 @@ def current_time( start_time ):
     current_time                    = time.time() - start_time
     return current_time
 
+# ------------------------------------------------------------------------------------------------- #
+
+def vis_layers( layers ):
+    '''
+    Visualization of squished lines
+    '''
+
+    bar_width                       = 0.35
+    Nlayers                         = len( layers )
+    part                            = {}
+##    for i in range( 0, Nlayers ):
+##        part
+        
 
 # ================================================================================================= #
 # Program
 # ================================================================================================= #
 
-Nlayers                             = len( target_layers )
+Nlayers                                     = len( target_layers )
 
-start_time                          = time.time()
-input_file_obj, lines               = read_gcode( input_filename )
+start_time                                  = time.time()
+input_file_obj, lines                       = read_gcode( input_filename )
 
 if Nlayers == 1:
-    mod_indeces, mod_lines          = squish_layers( lines, target_layers[0], squish_percentage[0] )
+    mod_indeces, mod_lines, layers          = squish_layers( lines, target_layers[0], squish_percentage[0] )
 elif Nlayers > 1:
     for i in range( 0, Nlayers ):
         if i == 0:
-            mod_indeces, mod_lines  = squish_layers( lines, target_layers[i], squish_percentage[i] )
+            mod_indeces, mod_lines, layers  = squish_layers( lines, target_layers[i], squish_percentage[i] )
         elif i > 0:
-            mod_indeces, mod_lines  = squish_layers( mod_lines, target_layers[i], squish_percentage[i] )
+            mod_indeces, mod_lines, layers  = squish_layers( mod_lines, target_layers[i], squish_percentage[i] )
 
 write_gcode( output_filename, mod_lines )
+
+# ------------------------------------------------------------------------------------------------- #
+
+Nx = 2
+Nlayers = len(layers)
+p = {}
+
+for h in range( 0, 2 ):
+    for i in range( 0, Nlayers ):
+        if i == 0:
+            p[str(i)] = plt.bar(h, layers[i][h+1], 0.35)
+        if i > 0:
+            p[str(i)] = plt.bar(h, ( layers[i][h+1] - layers[i-1][h+1] ), 0.35, bottom=layers[i-1][h+1])
+
+plt.xticks([0,1], ('G1', 'G2'))
+plt.yticks(np.arange(0, 2.0, 0.15))
+plt.grid(True, axis='y', linestyle=':')
+plt.show()
+
+    
 
 
 
