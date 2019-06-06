@@ -16,8 +16,8 @@ Authors:
 
 import  os
 import  time
-import  numpy               as  np
-import  matplotlib.pyplot   as  plt
+##import  numpy               as  np
+##import  matplotlib.pyplot   as  plt
 
 # ================================================================================================= #
 # Variables
@@ -26,8 +26,8 @@ import  matplotlib.pyplot   as  plt
 
 # USER MUST CHANGE THIS --------------------------------------------------------------------------- #
 input_filename                  = 'P6.gcode'
-target_layers                   = [3]#[3,5]
-squish_percentage               = [0.50]#[0.50,0.50]
+target_layers                   = [5,9,13,16,17,18]
+squish_percentage               = [0.50,0.50,0.50,0.50,0.50,0.50]
 # ------------------------------------------------------------------------------------------------- #
 
 input_filename_wo_extension     = input_filename[ :input_filename.find('.') ]                       # extract input filename without extension
@@ -105,8 +105,8 @@ def squish_layers( lines, layer, percentage ):
             remove_semi_colon = lines[i].strip(';')
             split_by_comma = remove_semi_colon.split(',')
             try:
-                layer_number        = int(split_by_comma[0].split(' ')[2])
-                z_height            = float( split_by_comma[1].split(' ')[3][:-1] )
+                layer_number        = int(      split_by_comma[0].split(' ')[2]             )
+                z_height            = float(    split_by_comma[1].split(' ')[3][:-1]        )
             except:
                 pass
 
@@ -114,7 +114,7 @@ def squish_layers( lines, layer, percentage ):
             if layer_number >= layer:
                 if layer_number >= 10:
                     ddp = 1
-                mod_val             =  round( z_height - ( layer_height*percentage ), 4)
+                mod_val             =  round(   z_height - ( layer_height*percentage ), 4   )
                 mod_str             =  '{}{}\n'.format( lines[i][:(15+ddp)], str( mod_val ) )
                 mod_indeces.append( i           )
                 mod_lines.append(   mod_str     )
@@ -152,9 +152,6 @@ def vis_layers( layers ):
     bar_width                       = 0.35
     Nlayers                         = len( layers )
     part                            = {}
-##    for i in range( 0, Nlayers ):
-##        part
-        
 
 # ================================================================================================= #
 # Program
@@ -170,7 +167,7 @@ if Nlayers == 1:
 elif Nlayers > 1:
     for i in range( 0, Nlayers ):
         if i == 0:
-            mod_indeces, mod_lines, layers  = squish_layers( lines, target_layers[i], squish_percentage[i] )
+            mod_indeces, mod_lines, init_layers  = squish_layers( lines, target_layers[i], squish_percentage[i] )
         elif i > 0:
             mod_indeces, mod_lines, layers  = squish_layers( mod_lines, target_layers[i], squish_percentage[i] )
 
@@ -178,21 +175,27 @@ write_gcode( output_filename, mod_lines )
 
 # ------------------------------------------------------------------------------------------------- #
 
-Nx = 2
-Nlayers = len(layers)
-p = {}
-
-for h in range( 0, 2 ):
-    for i in range( 0, Nlayers ):
-        if i == 0:
-            p[str(i)] = plt.bar(h, layers[i][h+1], 0.35)
-        if i > 0:
-            p[str(i)] = plt.bar(h, ( layers[i][h+1] - layers[i-1][h+1] ), 0.35, bottom=layers[i-1][h+1])
-
-plt.xticks([0,1], ('G1', 'G2'))
-plt.yticks(np.arange(0, 2.0, 0.15))
-plt.grid(True, axis='y', linestyle=':')
-plt.show()
+##Nx = 2
+##Nlayers = len(layers)
+##p = {}
+##
+##for h in range( 0, 2 ):
+##    for i in range( 0, Nlayers - 1):
+##        if h == 0:
+##            if i == 0:
+##                p[str(i)] = plt.bar(h, init_layers[i][h+1], 0.35)
+##            elif i > 0:
+##                p[str(i)] = plt.bar(h, ( init_layers[i][h+1] - init_layers[i-1][h+1] ), 0.35, bottom=layers[i-1][h+1])
+##        elif h > 0:
+##            if i == 0:
+##                p[str(i)] = plt.bar(h, layers[i][h+1], 0.35)
+##            elif i > 0:
+##                p[str(i)] = plt.bar(h, ( layers[i][h+1] - layers[i-1][h+1] ), 0.35, bottom=layers[i-1][h+1])
+##
+##plt.xticks([0,1], ('G1', 'G2'))
+##plt.yticks(np.arange(0, 2.0, 0.15))
+##plt.grid(True, axis='y', linestyle=':')
+##plt.show()
 
     
 
