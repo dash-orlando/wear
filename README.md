@@ -1,4 +1,4 @@
 # wear
 Repo. for the printed wearables project
 ## Feedback on code
-It works fine. Thank you.
+190617: squisher.py works fine. Thank you.
