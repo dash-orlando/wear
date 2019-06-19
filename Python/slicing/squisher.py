@@ -32,7 +32,7 @@ squish_percentage               = [0.50,0.50,0.50,0.50,0.50,0.50]
 
 input_filename_wo_extension     = input_filename[ :input_filename.find('.') ]                       # extract input filename without extension
 extension                       = 'gcode'                                                           # define extension... may never need changing
-output_filename                 = '{}_out.{}'.format( input_filename_wo_extension, extension )      # generate output filename to avoid overwriting
+output_filename                 = '{}_out_2.{}'.format( input_filename_wo_extension, extension )      # generate output filename to avoid overwriting
 
 
 # ================================================================================================= #
@@ -135,6 +135,57 @@ def squish_layers( lines, layer, percentage ):
 
 # ------------------------------------------------------------------------------------------------- #
 
+def squish_layers_2( lines, input_layer, percentage ):
+    '''
+    Reduces selected layers by a specific percentage
+    '''
+
+    print( '[{:0.6f}] Squishing!'.format( current_time(start_time) ) )
+
+    # --------------------------------------------------------------------------------------------- # defining variables
+    layer_def_index                 = []                                                            # ...indeces where layer definitions are made
+    mod_lines_index                 = []
+    orig_lines                      = []
+    orig_z                          = []
+    mod_lines                       = []
+    mod_z                           = []
+    Nlines                          = len(lines)
+    out_lines                       = lines
+
+    # --------------------------------------------------------------------------------------------- # determining layer height programatically
+    for i in range( 0, Nlines ):                                                                    # find layer height
+        if lines[i][4:15] == 'layerHeight':
+            layer_height            = float( lines[i][17:] )
+            print( '[{:0.6f}] GCODE Layer Height set to = {}'.format( current_time(start_time), layer_height ) )
+            break
+
+    # --------------------------------------------------------------------------------------------- # here we get the index of the layers
+    for i in range( 0, Nlines ):
+        if lines[i][0:7] == '; layer':
+            layer_def_index.append( i )
+
+    N_layer_def = len(layer_def_index)
+
+    # --------------------------------------------------------------------------------------------- # here we mod the lines between the input layer and the end of the file
+    for i in range( layer_def_index[input_layer-1], layer_def_index[N_layer_def-1] ):
+        if lines[i][0:4] == 'G1 Z':
+            mod_lines_index.append(     i                                                       )
+            orig_lines.append(          lines[i]                                                )
+            orig_z.append(              float( lines[i][4:9] )                                  )
+            mod_z.append(               round(   orig_z[-1] - ( layer_height*percentage ), 4   ))
+            mod_lines.append(           'G1 Z{:0.3f} {}'.format( mod_z[-1], lines[i][10:] )     )
+
+    # --------------------------------------------------------------------------------------------- # generate all lines for output file
+    N_mod_lines = len( mod_lines_index )
+    out_lines = lines
+    for i in range( 0, N_mod_lines ):
+        out_lines[ mod_lines_index[i] ] = mod_lines[i]
+    
+    # --------------------------------------------------------------------------------------------- # output/return
+    return out_lines, layer_def_index , mod_lines_index, orig_lines, orig_z, mod_lines, mod_z 
+
+# ------------------------------------------------------------------------------------------------- #
+
 def current_time( start_time ):
     '''
     Stopwatch type function
@@ -163,15 +214,15 @@ start_time                                  = time.time()
 input_file_obj, lines                       = read_gcode( input_filename )
 
 if Nlayers == 1:
-    mod_indeces, mod_lines, layers          = squish_layers( lines, target_layers[0], squish_percentage[0] )
+    out_lines, layer_def_index , mod_lines_index, orig_lines, orig_z, mod_lines, mod_z              = squish_layers_2( lines, target_layers[0], squish_percentage[0]        )
 elif Nlayers > 1:
     for i in range( 0, Nlayers ):
         if i == 0:
-            mod_indeces, mod_lines, init_layers  = squish_layers( lines, target_layers[i], squish_percentage[i] )
+            out_lines, layer_def_index , mod_lines_index, orig_lines, orig_z, mod_lines, mod_z      = squish_layers_2( lines, target_layers[i], squish_percentage[i]        )
         elif i > 0:
-            mod_indeces, mod_lines, layers  = squish_layers( mod_lines, target_layers[i], squish_percentage[i] )
+            out_lines, layer_def_index , mod_lines_index, orig_lines, orig_z, mod_lines, mod_z      = squish_layers_2( out_lines, target_layers[i], squish_percentage[i]    )
 
-write_gcode( output_filename, mod_lines )
+write_gcode( output_filename, out_lines )
 
 # ------------------------------------------------------------------------------------------------- #
 
@@ -196,8 +247,3 @@ write_gcode( output_filename, mod_lines )
 ##plt.yticks(np.arange(0, 2.0, 0.15))
 ##plt.grid(True, axis='y', linestyle=':')
 ##plt.show()
-
-    
-
-
-
